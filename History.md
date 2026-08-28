@@ -4,6 +4,7 @@
   * Avoid discarded arrays while appending multipart parts.
 
 * Bug fixes:
+  * Replay original request bodies and content headers for HTTP 307/308 redirects.
   * Forward keyword arguments through UploadedFile delegation.
   * Normalize mixed multipart arrays without mutating input.
   * Preserve the source encoding when building multipart uploads.
