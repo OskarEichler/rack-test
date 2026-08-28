@@ -1,5 +1,8 @@
 ## main
 
+* Bug fixes:
+  * Forward keyword arguments through UploadedFile delegation on Ruby 3+.
+
 * Minor enhancements:
   * Add `Rack::Test::Session#default_input_content_type` and
     `#convert_input_hash_to_string` private methods to allow for

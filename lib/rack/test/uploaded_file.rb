@@ -52,6 +52,7 @@ module Rack
       def method_missing(method_name, *args, &block)
         tempfile.public_send(method_name, *args, &block)
       end
+      ruby2_keywords(:method_missing) if respond_to?(:ruby2_keywords, true)
 
       # Append to given buffer in 64K chunks to avoid multiple large
       # copies of file data in memory.  Rewind tempfile before and
