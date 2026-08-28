@@ -52,6 +52,7 @@ module Rack
       def method_missing(method_name, *args, &block)
         tempfile.public_send(method_name, *args, &block)
       end
+      ruby2_keywords(:method_missing) if respond_to?(:ruby2_keywords, true)
 
       # Append to given buffer in 64K chunks to avoid multiple large
       # copies of file data in memory.  Rewind tempfile before and
@@ -60,12 +61,13 @@ module Rack
       def append_to(buffer)
         tempfile.rewind
 
-        buf = String.new
-        buffer << tempfile.readpartial(65_536, buf) until tempfile.eof?
-
-        tempfile.rewind
-
-        nil
+        begin
+          buf = String.new
+          buffer << tempfile.readpartial(65_536, buf) until tempfile.eof?
+          nil
+        ensure
+          tempfile.rewind
+        end
       end
 
       def respond_to_missing?(method_name, include_private = false) #:nodoc:

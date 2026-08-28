@@ -1,3 +1,13 @@
+## Unreleased consumer fixes for 2.2.0
+
+* Bug fixes:
+  * Forward keyword arguments through UploadedFile delegation.
+  * Normalize mixed multipart arrays without mutating input.
+  * Preserve the source encoding when building multipart uploads.
+  * Rewind uploaded files when appending raises.
+  * Preserve the request method and params for HTTP 308 redirects.
+  * Keep cookie jar storage separate from caller arrays.
+
 ## 2.2.0 / 2024-12-23
 
 * Bug fixes:

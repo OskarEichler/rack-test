@@ -136,7 +136,7 @@ module Rack
 
       def initialize(cookies = [], default_host = DEFAULT_HOST)
         @default_host = default_host
-        @cookies = cookies.sort!
+        @cookies = cookies.sort
       end
 
       # Ensure the copy uses a distinct cookies array.
