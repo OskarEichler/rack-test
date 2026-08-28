@@ -219,7 +219,7 @@ module Rack
 
         if last_response.status == 307 || last_response.status == 308
           request_method = last_request.request_method
-          if input = last_request.body
+          if (input = last_request.body)
             input.rewind
             env[:input] = input
           end
