@@ -1,5 +1,8 @@
 ## Unreleased consumer fixes for 2.2.0
 
+* Minor enhancements:
+  * Avoid discarded arrays while appending multipart parts.
+
 * Bug fixes:
   * Forward keyword arguments through UploadedFile delegation.
   * Normalize mixed multipart arrays without mutating input.
