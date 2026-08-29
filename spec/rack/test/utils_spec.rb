@@ -78,6 +78,18 @@ end
 describe 'Rack::Test::Utils.build_multipart' do
   include Rack::Test::Utils
 
+  it 'preserves the source encoding of uploaded StringIO content' do
+    source = +"café"
+    file = Rack::Test::UploadedFile.new(
+      StringIO.new(source),
+      original_filename: 'content.txt'
+    )
+
+    Rack::Test::Utils.build_multipart('file' => file)
+
+    source.encoding.must_equal Encoding::UTF_8
+  end
+
   it 'builds multipart bodies' do
     files = Rack::Test::UploadedFile.new(multipart_file('foo.txt'))
     data  = Rack::Test::Utils.build_multipart('submit-name' => 'Larry', 'files' => files)

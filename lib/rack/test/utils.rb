@@ -152,7 +152,6 @@ module Rack
 
         # Handle old versions of Capybara::RackTest::Form::NilUploadedFile
         if uploaded_file.respond_to?(:set_encoding)
-          uploaded_file.set_encoding(Encoding::BINARY)
           uploaded_file.append_to(buffer)
         end
 
