@@ -6,6 +6,15 @@ describe Rack::Test::CookieJar do
   cookie_value = 'foo;abc'.freeze
   cookie_name = 'a_cookie_name'.freeze
 
+  it 'does not retain or mutate the supplied cookie array' do
+    cookies = [].freeze
+    jar = Rack::Test::CookieJar.new(cookies)
+    jar['a'] = 'b'
+
+    cookies.must_be_empty
+    jar.to_hash.must_equal 'a' => 'b'
+  end
+
   it 'copies should not share a cookie jar' do
     jar = Rack::Test::CookieJar.new
     jar_dup = jar.dup
