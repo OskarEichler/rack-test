@@ -120,7 +120,7 @@ module Rack
         buffer <<
           START_BOUNDARY <<
           "content-disposition: form-data; name=\"" <<
-          parameter_name.to_s.b <<
+          multipart_parameter_name(parameter_name) <<
           "\"\r\n\r\n" <<
           value.to_s.b <<
           "\r\n"
@@ -132,7 +132,7 @@ module Rack
         buffer <<
           START_BOUNDARY <<
           "content-disposition: form-data; name=\"" <<
-          parameter_name.to_s.b <<
+          multipart_parameter_name(parameter_name) <<
           "\"; filename=\"" <<
           escape_path(uploaded_file.original_filename).b <<
           "\"\r\ncontent-type: " <<
@@ -147,6 +147,20 @@ module Rack
         end
 
         buffer << "\r\n"
+      end
+
+      # Return a quoted-string-safe multipart parameter name.
+      def multipart_parameter_name(parameter_name)
+        parameter_name = parameter_name.to_s.b
+        if parameter_name.include?("\0") || parameter_name.include?("\r") || parameter_name.include?("\n")
+          raise ArgumentError, 'multipart parameter names cannot contain NUL, CR, or LF'
+        end
+
+        if Rack.release >= '2'
+          parameter_name.gsub(/["\\]/n) { |character| "\\#{character}" }
+        else
+          parameter_name
+        end
       end
     end
   end

@@ -43,6 +43,19 @@ module Rack
         # Set the path for the cookie to the directory containing
         # the request if it isn't set.
         @options['path'] ||= uri.path.sub(/\/[^\/]*\Z/, '')
+
+        @expires = begin
+          Time.parse(@options['expires']) if @options['expires']
+        rescue ArgumentError
+          nil
+        end
+
+        @max_age = begin
+          Integer(@options['max-age'], 10) if @options['max-age']
+        rescue ArgumentError
+          nil
+        end
+        @created_at = Time.now if @max_age
       end
 
       # Wether the given cookie can replace the current cookie in the cookie jar.
@@ -79,12 +92,16 @@ module Rack
 
       # A Time value for when the cookie expires, if the expires option is set.
       def expires
-        Time.parse(@options['expires']) if @options['expires']
+        @expires
       end
 
       # Whether the cookie is currently expired.
       def expired?
-        expires && expires < Time.now
+        if @max_age
+          @max_age <= 0 || @created_at + @max_age <= Time.now
+        else
+          expires && expires <= Time.now
+        end
       end
 
       # Whether the cookie is valid for the given URI.
@@ -93,13 +110,24 @@ module Rack
 
         uri.host = @default_host if uri.host.nil?
 
+        host = uri.host.downcase
+        cookie_domain = domain.downcase
+        domain_matches = host == cookie_domain ||
+          (!@exact_domain_match && host.end_with?(".#{cookie_domain}"))
+
         !!((!secure? || (secure? && uri.scheme == 'https')) &&
-          uri.host =~ Regexp.new("#{'^' if @exact_domain_match}#{Regexp.escape(domain)}$", Regexp::IGNORECASE))
+          domain_matches)
       end
 
       # Cookies that do not match the URI will not be sent in requests to the URI.
       def matches?(uri)
-        !expired? && valid?(uri) && uri.path.start_with?(path)
+        cookie_path = path
+        request_path = uri.path
+        path_matches = request_path == cookie_path ||
+          (request_path.start_with?(cookie_path) &&
+            (cookie_path.end_with?('/') || request_path[cookie_path.length] == '/'))
+
+        !expired? && valid?(uri) && path_matches
       end
 
       # Order cookies by name, path, and domain.
